@@ -1,0 +1,89 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  /* Gold/yellow primary for light mode */
+  --ifm-color-primary: #F0B354;
+  --ifm-color-primary-dark: #EDA640;
+  --ifm-color-primary-darker: #EC9F35;
+  --ifm-color-primary-darkest: #E58B1A;
+  --ifm-color-primary-light: #F2BD68;
+  --ifm-color-primary-lighter: #F4C473;
+  --ifm-color-primary-lightest: #F7D08D;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  /* Gold primary for dark mode */
+  --ifm-color-primary: #F0B354;
+  --ifm-color-primary-dark: #EDA640;
+  --ifm-color-primary-darker: #EC9F35;
+  --ifm-color-primary-darkest: #E58B1A;
+  --ifm-color-primary-light: #F2BD68;
+  --ifm-color-primary-lighter: #F4C473;
+  --ifm-color-primary-lightest: #F7D08D;
+  --ifm-background-color: #1E1E1E;
+  --ifm-background-surface-color: #2A2A2A;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Hero section styling with primary accent */
+.hero--primary {
+  background: linear-gradient(135deg, #F0B354 0%, #E58B1A 100%);
+  color: white;
+  border-bottom: 1px solid #1E1E1E;
+}
+
+.hero--primary .hero__title,
+.hero--primary .hero__subtitle {
+  color: white;
+}
+
+.hero--primary .button--secondary {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #E58B1A;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.hero--primary .button--secondary:hover {
+  background-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Gray border accents */
+.navbar {
+  border-bottom: 1px solid #1E1E1E;
+}
+
+/* Compact footer */
+.footer {
+  padding: 0.75rem 0;
+  border-top: 1px solid #1E1E1E;
+}
+.footer__bottom {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+/* Sidebar border */
+.theme-doc-sidebar-container {
+  border-right: 1px solid #1E1E1E !important;
+}
+
+[data-theme='dark'] .navbar {
+  border-bottom-color: #444;
+}
+[data-theme='dark'] .footer {
+  border-top-color: #444;
+}
+[data-theme='dark'] .theme-doc-sidebar-container {
+  border-right-color: #444 !important;
+}

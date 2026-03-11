@@ -1,0 +1,8 @@
+node_modules
+build
+.docusaurus
+.git
+.gitignore
+.sisyphus
+ansible
+README.md

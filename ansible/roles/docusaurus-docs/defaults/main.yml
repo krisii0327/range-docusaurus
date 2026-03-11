@@ -1,0 +1,12 @@
+# Docusaurus projekt elérési útja
+docusaurus_path: "{{ playbook_dir | dirname }}"
+
+# Docker compose restart after deployment
+# Restart needed because --poll flag only watches existing files, not new directories
+docker_compose_restart: true
+
+# Base directories to keep (never delete during orphan cleanup)
+baseline_dirs:
+  - organization
+  - projects
+  - Test

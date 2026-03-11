@@ -1,0 +1,61 @@
+---
+# Docusaurus docs deployment - file-based scenarios
+# Each scenario is a subdirectory in files/scenarios/ with ready-to-deploy content
+
+- name: Find scenario directories
+  find:
+    paths: "{{ role_path }}/files/scenarios"
+    file_type: directory
+    recurse: false
+  register: scenario_dirs
+
+- name: Filter to single scenario if specified
+  set_fact:
+    deploy_dirs: "{{ scenario_dirs.files | selectattr('path', 'search', deploy_scenario) | list }}"
+  when: deploy_scenario is defined
+
+- name: Deploy all scenarios if no filter
+  set_fact:
+    deploy_dirs: "{{ scenario_dirs.files }}"
+  when: deploy_scenario is not defined
+
+- name: Copy scenario files to docs
+  copy:
+    src: "{{ item.path }}/"
+    dest: "{{ docusaurus_path }}/docs/{{ item.path | basename }}/"
+    mode: "0644"
+    directory_mode: "0755"
+  loop: "{{ deploy_dirs }}"
+  register: deploy_result
+
+- name: Remove orphaned scenario directories
+  block:
+    - name: List existing doc directories
+      find:
+        paths: "{{ docusaurus_path }}/docs"
+        file_type: directory
+        recurse: false
+      register: existing_dirs
+
+    - name: Build list of managed scenario names
+      set_fact:
+        scenario_names: "{{ scenario_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+    - name: Remove directories not in scenarios or baseline
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ existing_dirs.files }}"
+      when:
+        - item.path | basename not in baseline_dirs
+        - item.path | basename not in scenario_names
+  when: deploy_scenario is not defined  # Only run orphan cleanup on full deploys
+
+- name: Restart Docusaurus dev container
+  command: docker compose restart dev
+  args:
+    chdir: "{{ docusaurus_path }}"
+  when:
+    - docker_compose_restart | default(true)
+    - deploy_result is changed
+  # Restart needed because --poll flag only watches existing files, not new directories

@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+build/
+
+# Docusaurus cache
+.docusaurus/
+
+# Environment
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sisyphus orchestration
+.sisyphus/

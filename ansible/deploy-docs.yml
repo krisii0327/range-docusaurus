@@ -1,0 +1,30 @@
+---
+# Docusaurus docs deployment playbook
+#
+# Használat:
+#   Összes scenario deploy:
+#     ansible-playbook -i inventory/hosts.yml deploy-docs.yml
+#
+#   Csak egy scenario (tag-gel):
+#     ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "deploy_scenario=network-infra"
+#
+#   Dry-run (check mode):
+#     ansible-playbook -i inventory/hosts.yml deploy-docs.yml --check --diff
+
+- name: Deploy documentation to Docusaurus
+  hosts: docusaurus-server
+  become: false
+
+  pre_tasks:
+    - name: Verify Docusaurus directory exists
+      stat:
+        path: "{{ docusaurus_path }}/docusaurus.config.js"
+      register: docusaurus_check
+
+    - name: Fail if Docusaurus not found
+      fail:
+        msg: "Docusaurus not found at {{ docusaurus_path }}"
+      when: not docusaurus_check.stat.exists
+
+  roles:
+    - docusaurus-docs

@@ -1,0 +1,19 @@
+name: "docusaurus"
+services:
+    dev:
+        build:
+            context: .
+            target: dev
+        ports:
+            - "3000:3000"
+        volumes:
+            # Only content and style files - nothing else
+            - ./docs:/opt/docusaurus/docs
+            - ./blog:/opt/docusaurus/blog
+            - ./src:/opt/docusaurus/src
+            - ./static:/opt/docusaurus/static
+            # Config files (mount individually)
+            - ./docusaurus.config.js:/opt/docusaurus/docusaurus.config.js
+            - ./sidebars.js:/opt/docusaurus/sidebars.js
+        environment:
+            - NODE_ENV=development
