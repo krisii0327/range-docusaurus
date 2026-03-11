@@ -6,7 +6,7 @@ Belső dokumentációs portál Docusaurus alapokon, Ansible-lel telepített forg
 
 Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutions számára. A rendszer két rétegű architektúrát használ:
 
-- **Alap tartalom**: statikus dokumentáció git verziókezelés alatt
+- **Alap tartalom**: statikus dokumentáció (szervezeti, projekt, bevezető)
 - **Forgatókönyvek**: dinamikus tartalom Ansible-lel telepítve
 
 ## Architektúra
@@ -15,7 +15,7 @@ Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutio
 ┌─────────────────────────────────────────────────────────────┐
 │                    Docusaurus Portál                       │
 ├─────────────────────────────────────────────────────────────┤
-│  Alap réteg (git-tracked)                                   │
+│  Alap réteg                                                │
 │  ├── docs/intro.md                                          │
 │  ├── docs/organization/                                     │
 │  ├── docs/projects/                                         │
@@ -23,7 +23,7 @@ Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutio
 │  ├── src/                                                   │
 │  └── static/                                                │
 ├─────────────────────────────────────────────────────────────┤
-│  Forgatókönyv réteg (Ansible-managed, gitignored)          │
+│  Forgatókönyv réteg (Ansible-managed)                       │
 │  ├── docs/dev-standards/     ← ansible telepítés           │
 │  └── docs/network-infra/     ← ansible telepítés           │
 └─────────────────────────────────────────────────────────────┘
@@ -53,15 +53,6 @@ docker compose up
 - Elérhető: http://localhost:3000
 - Volume mount-ok: docs/, blog/, src/, static/, config fájlok
 - Hot reload támogatás
-
-### Produkciós build
-```bash
-# Serve target
-docker build --target serve -t docusaurus-serve .
-
-# Caddy target (Caddyfile szükséges)
-docker build --target caddy -t docusaurus-caddy .
-```
 
 ## Ansible forgatókönyv telepítés
 
@@ -114,6 +105,38 @@ ansible-playbook -i inventory/hosts.yml deploy-docs.yml --check --diff
    ansible-playbook -i inventory/hosts.yml deploy-docs.yml
    ```
 
+## Új blog bejegyzés hozzáadása
+
+A blog bejegyzések a `blog/` mappában találhatók. Új bejegyzés hozzáadásához hozz létre egy markdown fájlt a következő névkonvencióval:
+
+```
+blog/YYYY-MM-DD-bejegyzes-cime.md
+```
+
+Példa (`blog/2025-04-10-new-feature.md`):
+
+```markdown
+---
+title: "Új funkció bemutatása"
+authors:
+  - name: Fejlesztő Csapat
+    title: Engineering
+tags: [feature, announcement]
+description: "Rövid leírás a bejegyzésről."
+---
+
+A bejegyzés bevezető része, ami a blog listában is megjelenik.
+
+<!-- truncate -->
+
+A teljes bejegyzés tartalma itt folytatódik...
+```
+
+A `<!-- truncate -->` komment jelzi, hol vágja el a Docusaurus az előnézetet a blog listában.
+
+A dev szerver (`docker compose up`) automatikusan észleli az új fájlokat a `blog/` mappában.
+
+
 ## Alap vs Forgatókönyv
 
 ### Védett könyvtárak
@@ -126,11 +149,11 @@ A `ansible/roles/docusaurus-docs/defaults/main.yml` fájlban definiált `baselin
 ### Automatikus tisztítás
 Az Ansible-ből eltávolított forgatókönyvek automatikusan törlődnek a teljes telepítés során.
 
-## .gitignore megjegyzés
+## Forgatókönyv könyvtárak
 
-A `docs/` mappában lévő forgatókönyv könyvtárak git-ignore alatt vannak, mert ezeket az Ansible kezeli, nem kézi szerkesztéssel.
+A `docs/` mappában lévő forgatókönyv könyvtárakat az Ansible kezeli, nem kézi szerkesztéssel.
 
-Jelenlegi gitignored forgatókönyv könyvtárak:
+Jelenlegi Ansible-managed forgatókönyv könyvtárak:
 - `docs/dev-standards/`
 - `docs/network-infra/`
 
@@ -151,8 +174,8 @@ Jelenlegi gitignored forgatókönyv könyvtárak:
 ├── blog/                       # Blog bejegyzések
 ├── docs/                       # Dokumentáció gyökér
 │   ├── intro.md                # Üdvözlő oldal (alap)
-│   ├── organization/           # Alap - git-tracked
-│   └── projects/               # Alap - git-tracked
+│   ├── organization/           # Alap
+│   └── projects/               # Alap
 │   # Ansible telepíti ide a forgatókönyv könyvtárakat (gitignored):
 │   # ├── dev-standards/        # ← ansible forgatókönyvekből
 │   # └── network-infra/        # ← ansible forgatókönyvekből
