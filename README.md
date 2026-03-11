@@ -83,9 +83,12 @@ Jelenleg minden localhost-on fut. Amennyiben ez később változik (pl. távoli 
 ### Gyors parancsok
 
 ```bash
-# Docs forgatókönyvek telepítése
+# Összes docs forgatókönyv telepítése
 cd ansible
 ansible-playbook -i inventory/hosts.yml deploy-docs.yml
+
+# Csak egy adott scenario (mappa) telepítése
+ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "deploy_scenario=network-infra"
 
 # Blog bejegyzések telepítése
 ansible-playbook -i inventory/hosts.yml deploy-blog.yml
