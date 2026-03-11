@@ -24,6 +24,11 @@ Thumbs.db
 # Sisyphus orchestration
 .sisyphus/
 
-# Ansible-deployed doc scenarios
+# Ansible-deployed content
 docs/dev-standards/
 docs/network-infra/
+
+# Ansible-deployed blog posts (all ignored, baseline negated)
+blog/*.md
+!blog/2025-02-15-building-modern-docs.md
+!blog/2025-03-01-welcome.md
