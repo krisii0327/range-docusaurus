@@ -9,12 +9,22 @@
     file_type: file
   register: blog_posts
 
+- name: Filter to single post if specified
+  set_fact:
+    deploy_posts: "{{ blog_posts.files | selectattr('path', 'search', deploy_post) | list }}"
+  when: deploy_post is defined
+
+- name: Deploy all posts if no filter
+  set_fact:
+    deploy_posts: "{{ blog_posts.files }}"
+  when: deploy_post is not defined
+
 - name: Copy blog posts to blog directory
   copy:
     src: "{{ item.path }}"
     dest: "{{ docusaurus_path }}/blog/{{ item.path | basename }}"
     mode: "0644"
-  loop: "{{ blog_posts.files }}"
+  loop: "{{ deploy_posts }}"
   register: deploy_result
 
 - name: Remove orphaned blog posts

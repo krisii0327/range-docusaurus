@@ -37,13 +37,13 @@ Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutio
 │  ├── docs/dev-standards/     ← ansible docs role            │
 │  ├── docs/network-infra/     ← ansible docs role            │
 │  └── blog/*.md               ← ansible blog role            │
-                              └─────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────┘
                               ▲
                               │
                     ┌─────────────────┐
                     │  Ansible Roles  │
-                    │  docusaurus-docs │
-                    │  docusaurus-blog │
+                    │ docusaurus-docs │
+                    │ docusaurus-blog │
                     └─────────────────┘
 ```
 
@@ -90,8 +90,11 @@ ansible-playbook -i inventory/hosts.yml deploy-docs.yml
 # Csak egy adott scenario (mappa) telepítése
 ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "deploy_scenario=network-infra"
 
-# Blog bejegyzések telepítése
+# Összes blog bejegyzés telepítése
 ansible-playbook -i inventory/hosts.yml deploy-blog.yml
+
+# Csak egy adott blog post telepítése
+ansible-playbook -i inventory/hosts.yml deploy-blog.yml -e "deploy_post=2026-03-15-ansible-automation"
 ```
 
 ## Fájlstruktúra
