@@ -33,23 +33,26 @@ Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutio
 │  ├── src/                                                   │
 │  └── static/                                                │
 ├─────────────────────────────────────────────────────────────┤
-│  Forgatókönyv réteg (Ansible-managed)                       │
-│  ├── docs/dev-standards/     ← ansible telepítés           │
-│  └── docs/network-infra/     ← ansible telepítés           │
-└─────────────────────────────────────────────────────────────┘
+│  Ansible-managed réteg                                      │
+│  ├── docs/dev-standards/     ← ansible docs role            │
+│  ├── docs/network-infra/     ← ansible docs role            │
+│  └── blog/*.md               ← ansible blog role            │
+                              └─────────────────────────────────────────────────────────────┘
                               ▲
                               │
                     ┌─────────────────┐
-                    │ Ansible Roles   │
-                    │ scenarios/      │
-                    │ ├── dev-standards/
-                    │ └── network-infra/
+                    │  Ansible Roles  │
+                    │  docusaurus-docs │
+                    │  docusaurus-blog │
                     └─────────────────┘
 ```
 
 ## Működés
 
-1. **Alap Docusaurus** Docker-ben fut (`docker compose up`)
+1. **Alap Docusaurus** Docker-ben fut (`docker compose up -d`)
+2. **Ansible playbook** átmásolja a forgatókönyv könyvtárakat a `docs/` és blog bejegyzéseket a `blog/` mappába
+3. **Docusaurus automatikusan** észleli az új és módosult markdown fájlokat
+4. **Docker dev konténer** automatikusan újraindul, ha új könyvtárak kerültek hozzáadásra
 2. **Ansible playbook** átmásolja a forgatókönyv könyvtárakat a `docs/` mappába
 3. **Docusaurus automatikusan** észleli az új markdown fájlokat
 4. **Docker dev konténer** újraindul, ha új könyvtárak kerültek hozzáadásra
