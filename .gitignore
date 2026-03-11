@@ -23,3 +23,7 @@ Thumbs.db
 
 # Sisyphus orchestration
 .sisyphus/
+
+# Ansible-deployed doc scenarios
+docs/dev-standards/
+docs/network-infra/
