@@ -196,9 +196,3 @@ Jelenlegi Ansible-managed forgatókönyv könyvtárak:
                 ├── dev-standards/
                 └── network-infra/
 ```
-
-## Megjegyzések
-
-- A Dockerfile caddy stage-je hivatkozik egy Caddyfile-ra, ami még nem létezik
-- A docusaurus.config.js mermaid téma támogatással rendelkezik
-- Csak `dev` service van definiálva a docker-compose.yml-ben
