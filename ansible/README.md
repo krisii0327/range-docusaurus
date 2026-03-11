@@ -1,126 +1,53 @@
-# Docusaurus Docs - Ansible Deployment
+# Docusaurus - Ansible Deployment
 
 ## Struktúra
 
 ```
 ansible/
-├── deploy-docs.yml                          # Fő playbook
+├── README.md                # Áttekintés (ez a fájl)
+├── DOCS-DEPLOY.md          # Docs telepítési útmutató
+├── BLOG-DEPLOY.md          # Blog telepítési útmutató
+├── deploy-docs.yml          # Docs playbook
+├── deploy-blog.yml          # Blog playbook
 ├── inventory/
-│   └── hosts.yml                            # Célszerver(ek)
+│   └── hosts.yml                # Célszerver(ek)
 └── roles/
-    └── docusaurus-docs/
-        ├── defaults/
-        │   └── main.yml                     # Konfigurációs változók
-        ├── files/
-        │   └── scenarios/                   # Scenario tartalom (statikus fájlok)
-        │       ├── network-infra/
-        │       │   ├── _category_.json
-        │       │   ├── overview.md
-        │       │   └── vpn-guide.md
-        │       └── dev-standards/
-        │           ├── _category_.json
-        │           ├── code-review.md
-        │           ├── ci-cd.md
-        │           └── git-conventions.md
-        └── tasks/
-            └── main.yml                     # Deploy logika
+    ├── docusaurus-docs/         # Docs scenario role
+    └── docusaurus-blog/         # Blog deploy role
 ```
+
+## Részletes útmutatók
+
+| Típus | Útmutató | Playbook |
+|-------|----------|----------|
+| Docs forgatókönyvek | [DOCS-DEPLOY.md](DOCS-DEPLOY.md) | `deploy-docs.yml` |
+| Blog bejegyzések | [BLOG-DEPLOY.md](BLOG-DEPLOY.md) | `deploy-blog.yml` |
 
 ## Hogyan működik
 
-1. A `files/scenarios/` mappában minden scenario saját alkönyvtárban található, kész `.md` fájlokkal és `_category_.json`-nel
-2. A deploy során az Ansible `copy` modullal másolja a fájlokat a `docs/{{ scenario_name }}/` mappába
-3. Minden `.md` fájl frontmatter-ében egyedi ID van: `id: {{ scenario_name }}-{{ page_id }}`
-4. **Nincs ID ütközés**, mert a scenario név prefix-ként szerepel
-5. A fájlok közvetlenül szerkeszthetők — nincs szükség YAML multiline stringekre vagy Jinja2 template-ekre
+- A **docs role** forgatókönyv könyvtárakat másol a `docs/` mappába, ID ütközés-mentes prefix rendszerrel
+- A **blog role** blog bejegyzéseket másol a `blog/` mappába, baseline postok védelmével
+- Mindkét role támogatja a dry-run-t, automatikus konténer újraindítást és orphan cleanup-ot
 
 ## Projekt útvonal
 
 - **Helyi fejlesztés**: Az útvonal automatikusan felismerésre kerül a playbook helyéből
-- **Produkciós/távoli szerverek**: Felülírhatod a `docusaurus_path` változót az inventory-ban vagy `-e` paraméterrel:
+- **Produkciós/távoli szerverek**: Felülírható a `docusaurus_path` változóval:
 
 ```bash
-# Inventory-ban (hosts.yml):
-docusaurus_path: /opt/docusaurus
-
-# Vagy parancssorban:
 ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "docusaurus_path=/opt/docusaurus"
 ```
-## Használat
 
-### Összes scenario deploy
+## Gyors parancsok
+
 ```bash
+# Docs forgatókönyvek telepítése
 cd ansible
 ansible-playbook -i inventory/hosts.yml deploy-docs.yml
-```
 
-### Egy adott scenario deploy
-```bash
-ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "deploy_scenario=network-infra"
-```
+# Blog bejegyzések telepítése
+ansible-playbook -i inventory/hosts.yml deploy-blog.yml
 
-### Dry-run (változások megtekintése deploy nélkül)
-```bash
+# Dry-run
 ansible-playbook -i inventory/hosts.yml deploy-docs.yml --check --diff
 ```
-
-### Automatikus újraindítás
-
-A deployment után a Docusaurus dev konténer automatikusan újraindul, hogy az új könyvtárakat felismerje (a `--poll` flag csak a meglévő fájlokat figyeli, új mappákat nem). Ez kikapcsolható:
-
-```bash
-ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "docker_compose_restart=false"
-```
-
-## Új scenario hozzáadása
-
-Hozz létre egy új mappát a `files/scenarios/` alatt:
-
-```
-ansible/roles/docusaurus-docs/files/scenarios/my-new-scenario/
-├── _category_.json
-└── overview.md
-```
-
-**`_category_.json`:**
-```json
-{
-  "label": "My New Scenario",
-  "position": 12
-}
-```
-
-**`overview.md`:**
-```markdown
----
-sidebar_position: 1
-id: my-new-scenario-overview
-title: "Overview"
-description: "Overview - My New Scenario"
----
-
-# Overview
-
-Az oldal tartalma itt...
-```
-
-A scenario neve a mappa neve lesz (`my-new-scenario`), és minden `.md` fájl `id` mezőjében prefix-ként szerepel.
-
-## ID ütközés megelőzés
-
-A rendszer automatikusan prefix-eli az ID-kat:
-
-| Scenario | Page ID | Generált Docusaurus ID |
-|----------|---------|----------------------|
-| network-infra | overview | `network-infra-overview` |
-| dev-standards | overview | `dev-standards-overview` |
-| my-scenario | overview | `my-scenario-overview` |
-
-Ugyanaz a `page.id` (pl. `overview`) különböző scenario-kban **soha nem ütközik**.
-
-## Fontos megjegyzések
-
-- **Automatikus újraindítás**: A deployment után a Docusaurus dev konténer automatikusan újraindul új könyvtárak felismeréséhez
-- **Orphan cleanup**: Csak teljes deploy esetén fut (összes scenario), egyedi scenario deploy esetén nem törli a többi scenario mappáját
-- **Újraindítás kikapcsolása**: `docker_compose_restart: false` változóval
-- **Fájl-alapú szerkesztés**: A scenario tartalmakat közvetlenül a `.md` fájlokban szerkesztheted — nem kell YAML-t módosítani

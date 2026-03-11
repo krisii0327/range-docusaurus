@@ -1,0 +1,30 @@
+---
+# Docusaurus blog deployment playbook
+#
+# Használat:
+#   Blog bejegyzések deploy:
+#     ansible-playbook -i inventory/hosts.yml deploy-blog.yml
+#
+#   Orphan cleanup-pal (nem baseline postok törlése):
+#     ansible-playbook -i inventory/hosts.yml deploy-blog.yml -e "cleanup_blog=true"
+#
+#   Dry-run (check mode):
+#     ansible-playbook -i inventory/hosts.yml deploy-blog.yml --check --diff
+
+- name: Deploy blog posts to Docusaurus
+  hosts: docusaurus-server
+  become: false
+
+  pre_tasks:
+    - name: Verify Docusaurus directory exists
+      stat:
+        path: "{{ docusaurus_path }}/docusaurus.config.js"
+      register: docusaurus_check
+
+    - name: Fail if Docusaurus not found
+      fail:
+        msg: "Docusaurus not found at {{ docusaurus_path }}"
+      when: not docusaurus_check.stat.exists
+
+  roles:
+    - docusaurus-blog

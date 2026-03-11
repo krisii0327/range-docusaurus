@@ -1,0 +1,49 @@
+---
+# Docusaurus blog deployment - file-based blog posts
+# Each .md file in files/posts/ is a ready-to-deploy blog post
+
+- name: Find blog post files
+  find:
+    paths: "{{ role_path }}/files/posts"
+    patterns: "*.md"
+    file_type: file
+  register: blog_posts
+
+- name: Copy blog posts to blog directory
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ docusaurus_path }}/blog/{{ item.path | basename }}"
+    mode: "0644"
+  loop: "{{ blog_posts.files }}"
+  register: deploy_result
+
+- name: Remove orphaned blog posts
+  block:
+    - name: List existing blog files
+      find:
+        paths: "{{ docusaurus_path }}/blog"
+        patterns: "*.md"
+        file_type: file
+      register: existing_posts
+
+    - name: Build list of managed post filenames
+      set_fact:
+        managed_posts: "{{ blog_posts.files | map(attribute='path') | map('basename') | list }}"
+
+    - name: Remove posts not in managed or baseline
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ existing_posts.files }}"
+      when:
+        - item.path | basename not in baseline_posts
+        - item.path | basename not in managed_posts
+  when: cleanup_blog | default(false)  # Csak explicit kérésre fut az orphan cleanup
+
+- name: Restart Docusaurus dev container
+  command: docker compose restart dev
+  args:
+    chdir: "{{ docusaurus_path }}"
+  when:
+    - docker_compose_restart | default(true)
+    - deploy_result is changed

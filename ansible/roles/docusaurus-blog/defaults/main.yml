@@ -1,0 +1,12 @@
+# Docusaurus projekt elérési útja
+docusaurus_path: "{{ playbook_dir | dirname }}"
+
+# Docker compose restart after deployment
+# Blog fájlok változása hot reload-dal is érzékelhető,
+# de új fájlok hozzáadásakor restart szükséges lehet
+docker_compose_restart: true
+
+# Baseline blog bejegyzések (nem törli az orphan cleanup)
+baseline_posts:
+  - "2025-03-01-welcome.md"
+  - "2025-02-15-building-modern-docs.md"

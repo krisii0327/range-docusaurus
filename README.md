@@ -2,6 +2,16 @@
 
 Belső dokumentációs portál Docusaurus alapokon, Ansible-lel telepített forgatókönyv-alapú tartalommal.
 
+## Tartalomjegyzék
+
+- [Projekt áttekintés](#projekt-áttekintés)
+- [Architektúra](#architektúra)
+- [Indítás](#indítás)
+- [Ansible telepítés](#ansible-telepítés)
+  - [Docs forgatókönyv telepítés](ansible/DOCS-DEPLOY.md) — részletes útmutató
+  - [Blog bejegyzések telepítés](ansible/BLOG-DEPLOY.md) — részletes útmutató
+- [Fájlstruktúra](#fájlstruktúra)
+
 ## Projekt áttekintés
 
 Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutions számára. A rendszer két rétegű architektúrát használ:
@@ -58,108 +68,25 @@ Jelenleg minden localhost-on fut. Amennyiben ez később változik (pl. távoli 
 - `docusaurus.config.js` — `url` mező (jelenleg placeholder)
 - `docker-compose.yml` — port mapping, ha szükséges
 
-## Ansible forgatókönyv telepítés
+## Ansible telepítés
 
-Részletes dokumentáció: [ansible/README.md](ansible/README.md)
+Általános Ansible dokumentáció: [ansible/README.md](ansible/README.md)
 
-### Összes forgatókönyv telepítése
+| Típus | Playbook | Részletes útmutató |
+|-------|----------|-------------------|
+| Docs forgatókönyvek | `deploy-docs.yml` | [DOCS-DEPLOY.md](ansible/DOCS-DEPLOY.md) |
+| Blog bejegyzések | `deploy-blog.yml` | [BLOG-DEPLOY.md](ansible/BLOG-DEPLOY.md) |
+
+### Gyors parancsok
+
 ```bash
+# Docs forgatókönyvek telepítése
 cd ansible
 ansible-playbook -i inventory/hosts.yml deploy-docs.yml
+
+# Blog bejegyzések telepítése
+ansible-playbook -i inventory/hosts.yml deploy-blog.yml
 ```
-
-### Egyetlen forgatókönyv telepítése
-```bash
-ansible-playbook -i inventory/hosts.yml deploy-docs.yml -e "deploy_scenario=network-infra"
-```
-
-### Dry run
-```bash
-ansible-playbook -i inventory/hosts.yml deploy-docs.yml --check --diff
-```
-
-## Új forgatókönyv létrehozása
-
-1. **Könyvtár létrehozása**:
-   ```
-   ansible/roles/docusaurus-docs/files/scenarios/my-scenario/
-   ```
-
-2. **Kategória konfiguráció** (`_category_.json`):
-   ```json
-   {
-     "label": "My Scenario",
-     "position": 3
-   }
-   ```
-
-3. **Markdown fájlok** frontmatter-rel:
-   ```markdown
-   ---
-   id: my-scenario-overview
-   title: Áttekintés
-   ---
-   
-   Forgatókönyv tartalma...
-   ```
-
-4. **Telepítés**:
-   ```bash
-   cd ansible
-   ansible-playbook -i inventory/hosts.yml deploy-docs.yml
-   ```
-
-## Új blog bejegyzés hozzáadása
-
-A blog bejegyzések a `blog/` mappában találhatók. Új bejegyzés hozzáadásához hozz létre egy markdown fájlt a következő névkonvencióval:
-
-```
-blog/YYYY-MM-DD-bejegyzes-cime.md
-```
-
-Példa (`blog/2025-04-10-new-feature.md`):
-
-```markdown
----
-title: "Új funkció bemutatása"
-authors:
-  - name: Fejlesztő Csapat
-    title: Engineering
-tags: [feature, announcement]
-description: "Rövid leírás a bejegyzésről."
----
-
-A bejegyzés bevezető része, ami a blog listában is megjelenik.
-
-<!-- truncate -->
-
-A teljes bejegyzés tartalma itt folytatódik...
-```
-
-A `<!-- truncate -->` komment jelzi, hol vágja el a Docusaurus az előnézetet a blog listában.
-
-A dev szerver (`docker compose up`) automatikusan észleli az új fájlokat a `blog/` mappában.
-
-
-## Alap vs Forgatókönyv
-
-### Védett könyvtárak
-A `ansible/roles/docusaurus-docs/defaults/main.yml` fájlban definiált `baseline_dirs` védi bizonyos docs könyvtárakat a törlés ellen:
-
-- `organization/` - szervezeti dokumentáció
-- `projects/` - projekt dokumentáció  
-- `Test/` - teszt könyvtár (alapértelmezett)
-
-### Automatikus tisztítás
-Az Ansible-ből eltávolított forgatókönyvek automatikusan törlődnek a teljes telepítés során.
-
-## Forgatókönyv könyvtárak
-
-A `docs/` mappában lévő forgatókönyv könyvtárakat az Ansible kezeli, nem kézi szerkesztéssel.
-
-Jelenlegi Ansible-managed forgatókönyv könyvtárak:
-- `docs/dev-standards/`
-- `docs/network-infra/`
 
 ## Fájlstruktúra
 
@@ -184,15 +111,23 @@ Jelenlegi Ansible-managed forgatókönyv könyvtárak:
 │   # ├── dev-standards/        # ← ansible forgatókönyvekből
 │   # └── network-infra/        # ← ansible forgatókönyvekből
 └── ansible/
-    ├── README.md               # Részletes Ansible dokumentáció
-    ├── deploy-docs.yml         # Fő playbook
+    ├── README.md               # Ansible áttekintés
+    ├── DOCS-DEPLOY.md         # Docs telepítési útmutató
+    ├── BLOG-DEPLOY.md         # Blog telepítési útmutató
+    ├── deploy-docs.yml         # Docs playbook
+    ├── deploy-blog.yml         # Blog playbook
     ├── inventory/
     │   └── hosts.yml
     └── roles/
-        └── docusaurus-docs/
+        ├── docusaurus-docs/
+        │   ├── defaults/main.yml
+        │   ├── tasks/main.yml
+        │   └── files/scenarios/
+        │       ├── dev-standards/
+        │       └── network-infra/
+        └── docusaurus-blog/
             ├── defaults/main.yml
             ├── tasks/main.yml
-            └── files/scenarios/
-                ├── dev-standards/
-                └── network-infra/
+            └── files/posts/
+                └── *.md
 ```
