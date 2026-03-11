@@ -17,7 +17,7 @@ Belső dokumentációs portál Docusaurus alapokon, Ansible-lel telepített forg
 Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutions számára. A rendszer két rétegű architektúrát használ:
 
 - **Alap tartalom**: statikus dokumentáció (szervezeti, projekt, bevezető)
-- **Forgatókönyvek**: dinamikus tartalom Ansible-lel telepítve
+- **Ansible-managed tartalom**: docs forgatókönyvek és blog bejegyzések, Ansible-lel telepítve — tetszőleges számú scenario és post, egyenként is célozhatók
 
 ## Architektúra
 
@@ -34,9 +34,10 @@ Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutio
 │  └── static/                                                │
 ├─────────────────────────────────────────────────────────────┤
 │  Ansible-managed réteg                                      │
-│  ├── docs/dev-standards/     ← ansible docs role            │
-│  ├── docs/network-infra/     ← ansible docs role            │
-│  └── blog/*.md               ← ansible blog role            │
+│  ├── docs/<scenario>/        ← ansible docs role            │
+│  │   (pl. dev-standards, network-infra, ...)                │
+│  └── blog/<post>.md          ← ansible blog role            │
+│      (tetszőleges számú, egyenként célozható)               │
 └─────────────────────────────────────────────────────────────┘
                               ▲
                               │
