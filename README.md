@@ -141,3 +141,5 @@ ansible-playbook -i inventory/hosts.yml deploy-blog.yml -e "deploy_post=2026-03-
             └── files/posts/
                 └── *.md
 ```
+
+**Fontos:** A `.gitignore` wildcard + negáció mintát használ az Ansible-managed tartalomra. Új baseline docs mappa vagy blog post hozzáadásakor a `.gitignore`-ban is negálni kell (`!docs/mappanev/`, `!blog/fajlnev.md`), különben nem kerül be a verziókezelésbe.
