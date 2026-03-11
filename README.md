@@ -44,15 +44,19 @@ Ez egy dockerizált Docusaurus-alapú dokumentációs rendszer a CodeTechSolutio
 3. **Docusaurus automatikusan** észleli az új markdown fájlokat
 4. **Docker dev konténer** újraindul, ha új könyvtárak kerültek hozzáadásra
 
-## Docker használat
+## Indítás
 
-### Fejlesztői mód
 ```bash
-docker compose up
+docker compose up -d
 ```
-- Elérhető: http://localhost:3000
-- Volume mount-ok: docs/, blog/, src/, static/, config fájlok
-- Hot reload támogatás
+
+A parancs lebuildeli a Docker image-et és elindítja a dev szervert. Elérhető: http://localhost:3000
+
+Jelenleg minden localhost-on fut. Amennyiben ez később változik (pl. távoli szerverre költözik a portál), a következő helyeken kell módosítani az eléréseket:
+
+- `ansible/inventory/hosts.yml` — célszerver címe és kapcsolódási mód
+- `docusaurus.config.js` — `url` mező (jelenleg placeholder)
+- `docker-compose.yml` — port mapping, ha szükséges
 
 ## Ansible forgatókönyv telepítés
 
